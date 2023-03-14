@@ -17,9 +17,13 @@ git push -u origin main
 You can initialize this repository with code from a Subversion, Mercurial, or TFS project.
 
 git 命令
-git init            初始化项目
-git add .           将当前目录内容提交到暂存区
-git commit -m ""    提交到远程仓库
-git status          查看项目状态
-git log             查看提交记录 
-    
+git init                        初始化项目
+git add .                       将当前目录内容提交到暂存区
+git commit -m ""                提交到远程仓库
+git status                      查看项目状态
+git log                         查看提交记录 
+git log --author poiunet        查看poiunet的提交记录
+git config --global --list       查看配置
+git config --global user.name '***'  配置用户名
+git config --global user.email '***' 配置email
+
