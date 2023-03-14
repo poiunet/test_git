@@ -27,3 +27,6 @@ git config --global --list       查看配置
 git config --global user.name '***'  配置用户名
 git config --global user.email '***' 配置email
 
+git add ***.** 添加一个修改文件 未添加前 git status查看时文件名是红色，添加后是绿色 
+
+ git config --global core.quotepath  false  执行完这个命令，git就不会对路径进行转换，显示原来完整的中文路径。
