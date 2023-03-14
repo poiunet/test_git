@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  flask-demo:
+    build: 
+      context: ./flask
+      dockerfile: Dockerfile
+    image: flask-demo:latest
+    environment:
+      - REDIS_HOST=redis-server
+    networks:
+      - demo-network
+    ports:
+      - 8080:5000
+
+  redis-server:
+    image: redis:latest
+    networks:
+      - demo-network
+  
+  busybox:
+    image: busybox:latest
+    command: sh -c "while true; do sleep 3600;done"
+    networks:
+      - demo-network
+  
+
+networks:
+  demo-network:

@@ -1,0 +1,141 @@
+docker基础命令
+docker version 查看版本
+docker info 显示当前docker状态
+docker 显示可以的docker命令
+docker container ps  列出当前正在运行的容器
+docker container ps -a 列出当前所有的容器
+docker image ls 列出当前系统上存在的镜像
+
+image镜像
+包含文件系统，源码，库文件，依赖工具等运行application所需要的文件
+container容器
+一个运行中的docker image
+
+
+docker container ls  列出当前正在运行的容器
+docker container run nginx  运行nginx 
+docker container stop nginx 停止nginx 可以只写开头的字母
+docker container ls 可以省略为docker ls 
+docker container stop 加多个字符 可以停掉多个容器
+docker container ps -aq 列出所有container的id
+docker container stop $(docker container ps -qa) 批量关闭container
+docker container rm $(docker container ps -qa) 批量删除container
+不能删除正在运行的container
+可以强制删除 docker container rm XXXXXX -f
+docker container run --rm -it 加参数--rm 运行完就删除 
+
+ 
+attached模式 前台模式 前台执行 
+detached模式 后台模式 docker container run -d 
+docker attach XXID 可以变回attached模式
+一般不使用 attached模式
+
+
+交互模式
+docker container run -d -p 80:80 nginx 创建端口映射的nginx
+docker container logs XXXID 打印日志
+docker container stop XXXXID 停止容器
+docker container logs -f XXXID 动态跟踪日志
+docker container run -it ubuntu sh 交互模式启动 退出就关闭了
+docker exec -it XXXid sh 进入交互模式 退出不关闭 在一个已经运行的容器里执行一个额外的命令
+
+镜像获取
+从registry拉取 （公私）
+dockerfile构建 需联网
+导入（离线）
+
+镜像的拉取  docker image pull nginx
+
+docker image ls 列出本地存在的镜像
+docker image pull nginx：1.20.0  拉取特定版本
+docker image inspect imageID  查看镜像详细
+
+镜像导入导出
+导出docker image save nginx:1.20.0 -o 文件名 
+导入docker image load -i 文件名
+
+构建dockerfile 
+事先创建好Dockerfile（文件名就叫Dockerfile）
+docker image build -t hello .
+docker image build -t 镜像名称 Dockerfile所在目录
+docker image build -t 镜像名称 -f dockerfile文件   所在目录
+
+修改镜像标签
+方法一 docker image build -t poiunet/hello:1.0 . 
+方法二  docker image tag hello poiunet/hello:1.0
+
+ 删除镜像 docker image rm poiunet/hello:1.0
+
+ 
+ 登录dockerhub docker login
+ 
+ 推送image
+ docker image push poiunet/hello:1.0
+ 拉取image
+ docker pull poiunet/hello:1.0  (版本号要指定，除非指定了lastest版本)
+
+ docker image history imageXXXid   查看镜像分层
+ 
+ 
+ 
+从容器创建镜像
+
+docker container commit 容器id 镜像名称
+docker container commit e1e0   poiunet/nginx-hello
+
+进入容器交互式
+docker container exec -it XXXID sh
+
+基础镜像选择
+尽量选官方的其次是开源的
+固定版本tag 不要用latest
+选体积小的
+
+dockerfile文件中执行run最好写在一行 可以减少分层从而减少空间
+
+文件复制命令 copy和add
+都可以在复制时创建不存在的目录
+add在复制文件时可以解压缩文件
+
+workdir目录切换
+
+arg和env
+可以用来设置变量 ，env设置变量可以设置构建过程和容器内部的变量
+arg只能用在构建过程中
+
+docker system prune -f 
+清理删除已经退出的容器
+docker image prune -a
+清理没有使用的镜像
+
+CMD可以用来设置容器启动时默认执行的命令
+如果docker container run启动容器时制定了其他命令，则CMD命令会被忽略
+如果定义了多个cmd，只有最后一个会被执行
+
+entrypoint 可以设置容器启动时要执行的命令
+cmd所设置的命令，可以在docker container run 时传入其他命令覆盖掉cmd命令，但是entrypoint所设置的命令一定会被之星
+cmd和entrypoint同时支持shell和exec格式
+shell格式 cmd echo "hello docker"   entrypoint echo "hello docker"
+exec格式 entrypoint ["echo","hello docker"]  cmd ["echo","hello docker"]
+
+docker container run --rm -it demo-ent  echo "hello world"
+会打印hello dicker hello world 后加的命令会被当成字符串， 因为entrypoint定义的命令必须被执行
+
+
+缓存cache
+当某一层发生变化后该层以及该层之后的层不能再使用cache，所以可以把经常改变的内容尽量放到后边。
+
+dockerignore 设置docker忽略的文件，可以提构建速度，减少发送到后台构建的文件数
+
+
+多阶段构建 可以as一个有环境的镜像，然后从中拷贝出编译好或者需要的文件
+
+docker container top 容器ID 查看容器中进程情况
+
+容器中尽量使用非root用户 （可以自己创建用户）
+
+github上docker-library/official-images中有很多官方dockerfile
+
+
+在运行中的容器里创建的文件，都被保存在一个可写的容器层
+docker主要提供两种方式做数据持久化 data volume和bind mount
